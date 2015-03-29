@@ -10,11 +10,10 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "ConnectionHelper.h"
 
-@interface ViewController (){
+@interface ViewController () {
     NSString *username;
     NSString *password;
     NSString *elError;
-    
 }
 
 @end
@@ -23,44 +22,48 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loginService:) name:RECURSO_DESCARGADO object:nil];
     
     elError = @"";
-
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-
 }
 
 - (IBAction)buttonLogin:(id)sender {
     
+    elError = @"";
     
     NSMutableString *loginUrl = [[NSMutableString alloc]initWithString:@"https://quantitydgtic.appspot.com/_ah/api/login/v1/loginUser?"];
     
     username = self.usernameField.text;
-    password = self.passwordField.text;
+    username = [username stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
+    password = self.passwordField.text;
+    password = [password stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
     if ([username isEqual:@""]) {
         elError = @"Es necesario agregar un usuario";
+    } else if([username length] < 5 || [username length] > 20) {
+        elError = @"Longitud de usuario incorrecta, mínimo 5 y máximo 20";
     } else if([password isEqual:@""]) {
         elError = @"Es necesario agregar un password";
+    } else if([password length] < 8 || [username length] > 20) {
+        elError = @"Longitud de la contraseña incorrecta, mínimo 8 y máximo 20";
     }
     
-    if (![elError isEqualToString:@""]) {
-        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"" message:elError delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [av show];
-    } else {
+    if ([elError isEqualToString:@""]) {
         NSString *urlParameters = [NSString stringWithFormat:@"password=%@&usuario=%@",password,username];
         [loginUrl appendString:urlParameters];
         
         ConnectionHelper *cn = [[ConnectionHelper alloc] init];
         cn.opcionNotificacion = 1; //LOGIN NOTIFICATION
         [cn consumeWebService:loginUrl];
+    } else {
+        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"" message:elError delegate:self cancelButtonTitle:@"Aceptar" otherButtonTitles:nil];
+        [av show];
     }
 }
 
@@ -78,14 +81,14 @@
         ViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"MainViewController"];
         [self presentViewController:vc animated:YES completion:nil];
     } else {
-        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"" message:@"Datos incorrectos" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"" message:@"Datos incorrectos" delegate:self cancelButtonTitle:@"Aceptar" otherButtonTitles:nil];
         [av show];
     }
 }
 
-//metodo axuliar para obtener el cifrado del password ingreasado por el usuario
--(NSString*) sha1:(NSString*)input
-{
+// Método auxiliar para obtener el cifrado del password ingresado por el usuario
+-(NSString *) sha1:(NSString *)input {
+    
     const char *cstr = [input cStringUsingEncoding:NSUTF8StringEncoding];
     NSData *data = [NSData dataWithBytes:cstr length:input.length];
     

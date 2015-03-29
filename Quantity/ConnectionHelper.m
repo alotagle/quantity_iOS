@@ -35,12 +35,10 @@
     NSLog(@"%@", response);
     NSError *myError = nil;
     
-    // NSLog(@"After converting response to string %@",response);
-    
     //Parseando la respuesta del servidor tipo JSON a un array
     self.theResponse = [NSJSONSerialization JSONObjectWithData:self.receivedData options:NSJSONReadingAllowFragments error:&myError];
     
-    if(!myError){ //se parse correctamente
+    if(!myError) { //se parse correctamente
        
         switch (self.opcionNotificacion) {
             case LOGIN:
@@ -65,6 +63,8 @@
 
 
 -(void)consumeWebService:(NSString *)laUrl{
+    
+    NSLog(@"%@", laUrl);
     
     NSString *urlString = laUrl;
     NSURL *url = [[NSURL alloc]initWithString:urlString];

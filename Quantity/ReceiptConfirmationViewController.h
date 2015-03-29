@@ -8,8 +8,8 @@
 
 #import "ViewController.h"
 
-
 #define INFO_PARA_RECIBO  @"RECIBO"
+
 @interface ReceiptConfirmationViewController : ViewController
 
 @property(nonatomic,strong) NSString* total;

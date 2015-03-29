@@ -10,11 +10,10 @@
 
 #define PROCUTO_SELECCIONADO @"seleccionado"
 #define PRODUCTOS_AGREGADOS @"productos_agregados"
+#define LIMPIA_DATOS @"LIMPIA"
 
 @interface ItemsTableViewController : UITableViewController
 
 @property NSMutableArray *productosarray;
-
-
 
 @end

@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "PayPalMobile.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +18,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [PayPalMobile initializeWithClientIdsForEnvironments:@{PayPalEnvironmentProduction : @"AStXvUSSx3uIPhOxUhabP_2-GyvcnING3hpKsbrInJO9GAzR2p4vngQZmzkkxljeZep8Zgl_m6SGDZ58", PayPalEnvironmentSandbox : @"AR5BKRVgoI5ZwOqWbss_IhusbzgzmbStai51H9sRjcl4FPFmX-a-b_0zOwel3oW2m1bG582yeI91wFO_"}];
+    
     return YES;
 }
 

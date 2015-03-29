@@ -12,7 +12,6 @@
 #import "ItemCollectionViewCell.h"
 
 
-
 @interface ItemsCollectionViewController ()
 
 @end
@@ -29,12 +28,12 @@ static NSString * const reuseIdentifier = @"ItemCell";
     
     
     [self requestCatalogService];
-    // Se subscribe a las notificaciones de repsuesta cuando este listo
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reponseCatalogService:) name:CATALOGO_DESCARGADO object:nil];
+    // Se subscribe a las notificaciones de respuesta cuando este listo
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(responseCatalogService:) name:CATALOGO_DESCARGADO object:nil];
 }
 
 //se ejecuta una vez que se ha recibido la notificacion para la descarga de catalogo
-- (void) reponseCatalogService: (NSNotification *)laNotificacion {
+- (void)responseCatalogService: (NSNotification *)laNotificacion {
     NSDictionary *response = [laNotificacion userInfo];
     self.productosDictionaries = [[NSMutableDictionary alloc] init];
     
@@ -45,10 +44,9 @@ static NSString * const reuseIdentifier = @"ItemCell";
     }
     
     [self.collectionView reloadData];
-    
 }
 
--(void)requestCatalogService{
+- (void)requestCatalogService {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *username = [defaults objectForKey:@"username"];
     
@@ -56,11 +54,6 @@ static NSString * const reuseIdentifier = @"ItemCell";
     ConnectionHelper *cn = [[ConnectionHelper alloc] init];
     cn.opcionNotificacion = 2; //catalogos
     [cn consumeWebService:theUrl];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 /*
@@ -88,8 +81,6 @@ static NSString * const reuseIdentifier = @"ItemCell";
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
 
-    
-    
     NSDictionary *itemDictionary =[self.productosarray objectAtIndex:indexPath.row];
     NSString *itemDescription =[itemDictionary objectForKey:@"descripcion"];
     NSString *itemPrice = [itemDictionary objectForKey:@"precio"];
@@ -112,11 +103,10 @@ static NSString * const reuseIdentifier = @"ItemCell";
     return cell;
 }
 
--(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     
-    //se envia una notificacion de que seleccinoalgo del collection view y se envia
-    [[NSNotificationCenter defaultCenter] postNotificationName:PROCUTO_SELECCIONADO object:nil userInfo:[self.productosarray objectAtIndex:indexPath.row]];
-    NSLog(@"selecteditem ");
+    //se envia una notificacion de que seleccino algo del collection view y se envía
+    [[NSNotificationCenter defaultCenter] postNotificationName:PRODUCTO_SELECCIONADO object:nil userInfo:[self.productosarray objectAtIndex:indexPath.row]];
 }
 
 #pragma mark <UICollectionViewDelegate>

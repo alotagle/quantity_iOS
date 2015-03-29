@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-#define PROCUTO_SELECCIONADO @"seleccionado"
+#define PRODUCTO_SELECCIONADO @"seleccionado"
 
 @interface ItemsCollectionViewController : UICollectionViewController <UICollectionViewDelegateFlowLayout>
 

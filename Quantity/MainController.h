@@ -7,21 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PayPalMobile.h"
 
 #define PRODUCTOS_AGREGADOS @"productos_agregados" 
 #define INFO_PARA_RECIBO  @"RECIBO"
-#define PROCUTO_SELECCIONADO @"seleccionado"
+#define PRODUCTO_SELECCIONADO @"seleccionado"
 #define RECIBO_ENVIADO @"done_sending"
+#define LIMPIA_DATOS @"LIMPIA"
 
-@interface MainController : UIViewController
-@property (weak, nonatomic) IBOutlet UILabel *labelTotal;
+@interface MainController : UIViewController <PayPalPaymentDelegate>
+
 @property (weak, nonatomic) IBOutlet UILabel *labelCambio;
 - (IBAction)botonTarjeta:(id)sender;
-@property (weak, nonatomic) IBOutlet UIButton *botonEfectivo;
-
-
 @property NSMutableArray *productosParaRecibo;
-
-
 
 @end

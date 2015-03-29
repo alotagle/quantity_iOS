@@ -23,34 +23,66 @@
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
-    //se inicializa el arreglo que contendra los articulos seleccionadosP
-    self.productosarray = [[NSMutableArray alloc]init];
+    // se inicializa el arreglo que contendra los articulos seleccionados
+    self.productosarray = [[NSMutableArray alloc] init];
     
-    //se suscribe para obtener la notificacion de seleccion de producto
+    // se suscribe para obtener la notificacion de seleccion de producto
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(productoSeleccionado:) name:PROCUTO_SELECCIONADO object:nil];
     
+    // se suscribe para limpiar los datos
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(limpiaDatos) name:LIMPIA_DATOS object:nil];
     
+    self.tableView.allowsMultipleSelectionDuringEditing = NO;
 }
 
 
--(void)productoSeleccionado:(NSNotification *)theNotification{
-    NSDictionary *response = [theNotification userInfo];
-   // NSLog([NSString stringWithFormat:@"En el callback de notificacion %@",response.description]);
-    [self.productosarray addObject:response];
+-(void)productoSeleccionado:(NSNotification *)theNotification {
+    NSMutableDictionary *response = [[NSMutableDictionary alloc] initWithDictionary: [theNotification userInfo]];
+    BOOL repetido = NO;
+    
+    for (NSObject *elemento in self.productosarray) {
+
+        if ([[response valueForKey:@"id"]isEqualToString:[elemento valueForKey:@"id"]]) {
+
+            repetido = YES;
+            int uno = 1.0;
+            int actual = [[elemento valueForKey:@"cantidad"] integerValue] + uno;
+            [elemento setValue:[NSString stringWithFormat: @"%d", actual] forKey:@"cantidad"];
+        }
+    }
+    
+    if (!repetido) {
+        [response setValue:@1 forKey:@"cantidad"];
+        [self.productosarray addObject:response];
+    }
+    
     [self.tableView reloadData];
-    NSNumber *total = [[NSNumber alloc]initWithDouble:[self calculaTotal]];
-    NSMutableDictionary * totalDictionary = [[NSMutableDictionary alloc]init];
-    [totalDictionary setValue:total forKey:@"total"];
-    //se envia una notificacion de que se han agregado los elementos a la vista y calculado la suma total
-    [[NSNotificationCenter defaultCenter] postNotificationName:PRODUCTOS_AGREGADOS object:nil userInfo:totalDictionary];
-
     
+    [self actualizaTotal];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+
+-(double)calculaTotal{
+    double  total = 0.0;
+    
+    for(int i = 0; i < self.productosarray.count; i++){
+        NSMutableDictionary *tempItem = [self.productosarray objectAtIndex:i];
+        total += ([[tempItem objectForKey:@"precio"] doubleValue] * [[tempItem objectForKey:@"cantidad"] doubleValue]);
+    }
+    
+    return total;
 }
+
+
+-(void)actualizaTotal {
+    NSNumber *total = [[NSNumber alloc] initWithDouble:[self calculaTotal]];
+    NSMutableDictionary *totalDictionary = [[NSMutableDictionary alloc] init];
+    [totalDictionary setValue:total forKey:@"total"];
+    
+    // Se envía una notificación de que se han agregado los elementos a la vista y calculado la suma total
+    [[NSNotificationCenter defaultCenter] postNotificationName:PRODUCTOS_AGREGADOS object:nil userInfo:totalDictionary];
+}
+
 
 #pragma mark - Table view data source
 
@@ -68,47 +100,52 @@
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"tableCell" forIndexPath:indexPath];
     
-    //se obtiene el elemento del arreglo
+    UITableViewCell *cell = (UITableViewCell *)[tableView dequeueReusableCellWithIdentifier:@"tableElement"];
+    UILabel *precio;
+    UILabel *titulo;
+    UILabel *cantidad;
+    
+    // Se obtiene el elemento del arreglo
     NSDictionary *elObjetoSeleccionado = [self.productosarray objectAtIndex:indexPath.row];
-    //se actualizan los campos de la celda
-    cell.textLabel.text = [NSString stringWithFormat:@"$%@ %@",[elObjetoSeleccionado objectForKey:@"precio"],[elObjetoSeleccionado objectForKey:@"descripcion"]];
-   
+    
+    precio = (UILabel *)[cell viewWithTag:1];
+    [precio setText:[NSString stringWithFormat:@"$%@.00",[elObjetoSeleccionado objectForKey:@"precio"]]];
+    
+    titulo = (UILabel *)[cell viewWithTag:2];
+    [titulo setText:[NSString stringWithFormat:@"%@",[elObjetoSeleccionado objectForKey:@"descripcion"]]];
+    
+    cantidad = (UILabel *)[cell viewWithTag:3];
+    [cantidad setText:[NSString stringWithFormat:@"%@",[elObjetoSeleccionado objectForKey:@"cantidad"]]];
+    
+    // Se actualizan los campos de la celda
+    //    cell.textLabel.text = [NSString stringWithFormat:@"$%@ %@",[elObjetoSeleccionado objectForKey:@"precio"],[elObjetoSeleccionado objectForKey:@"descripcion"]];
     
     return cell;
 }
 
--(double )calculaTotal{
-    double  total = 0.0;
-    
-    for(int i = 0; i < self.productosarray.count; i++){
-         NSDictionary *tempItem = [self.productosarray objectAtIndex:i];
-        total += [[tempItem objectForKey:@"precio"]doubleValue];
-    }
-    return total;
-}
 
-
-/*
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     // Return NO if you do not want the specified item to be editable.
     return YES;
 }
-*/
 
-/*
+
+
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+        // [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        [self.productosarray removeObjectAtIndex:indexPath.row];
+        [self actualizaTotal];
+        [self.tableView reloadData];
+    }
+    
 }
-*/
+
 
 /*
 // Override to support rearranging the table view.
@@ -133,5 +170,11 @@
     // Pass the selected object to the new view controller.
 }
 */
+
+-(void)limpiaDatos {
+    self.productosarray = [[NSMutableArray alloc] init];
+    [self.tableView reloadData];
+    [self actualizaTotal];
+}
 
 @end
